@@ -23,7 +23,7 @@ public class CuratorReadWriteLockTest {
 		int nThread = 100;
 		Thread[] ts = new Thread[nThread];
 		for (int i = 0; i < nThread; i++) {
-			ts[i] = new Thread(new OrderWriteMain());
+			ts[i] = new Thread(new ReadWriteLockTester());
 		}
 
 		Arrays.asList(ts).parallelStream().forEach(t -> {

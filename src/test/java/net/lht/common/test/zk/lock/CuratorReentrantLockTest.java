@@ -23,7 +23,7 @@ public class CuratorReentrantLockTest {
 		int nThread = 100;
 		Thread[] ts = new Thread[nThread];
 		for(int i = 0; i < nThread; i++) {
-			ts[i] = new Thread(new OrderMain());
+			ts[i] = new Thread(new ReentrantLockTester());
 		}
 
 		Arrays.asList(ts).parallelStream().forEach(t -> {
