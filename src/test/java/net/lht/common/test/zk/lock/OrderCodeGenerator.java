@@ -1,4 +1,4 @@
-package com.bhz.lht.mystudy.zk.lock;
+package net.lht.common.test.zk.lock;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

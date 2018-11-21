@@ -1,4 +1,4 @@
-package com.bhz.lht.mystudy.zk.lock;
+package net.lht.common.zk.lock;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;

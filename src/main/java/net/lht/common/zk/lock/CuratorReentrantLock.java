@@ -1,4 +1,4 @@
-package com.bhz.lht.mystudy.zk.lock;
+package net.lht.common.zk.lock;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
