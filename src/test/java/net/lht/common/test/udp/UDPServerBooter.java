@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import net.lht.common.udp.ServerProcessor;
-import net.lht.common.udp.UDPServer;
+import net.lht.common.udp.UDPServerMultiThread;
 
 public class UDPServerBooter {
 
@@ -20,14 +20,14 @@ public class UDPServerBooter {
 			public byte[] process(byte[] data) {
 				LocalDateTime time = LocalDateTime.now();
 				String receStr = new String(data);
-				String ack = time.format(formatter) + " - Server Reced:" + receStr;
+				String ack = time.format(formatter) + " - Server Receved:" + receStr;
 				System.out.println(ack);
 				return ack.getBytes();
 			}
 
 		};
 
-		UDPServer server = new UDPServer(processor, port);
+		UDPServerMultiThread server = new UDPServerMultiThread(processor, port);
 		server.start();
 
 	}
