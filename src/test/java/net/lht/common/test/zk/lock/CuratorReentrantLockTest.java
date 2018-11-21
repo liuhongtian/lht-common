@@ -2,6 +2,8 @@ package net.lht.common.test.zk.lock;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +20,22 @@ public class CuratorReentrantLockTest {
 
 	@Test
 	public void test() {
-		fail("Not yet implemented");
+		int nThread = 100;
+		Thread[] ts = new Thread[nThread];
+		for(int i = 0; i < nThread; i++) {
+			ts[i] = new Thread(new OrderMain());
+		}
+
+		Arrays.asList(ts).parallelStream().forEach(t -> {
+			t.start();
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		
+		assertTrue(true);
 	}
 
 }

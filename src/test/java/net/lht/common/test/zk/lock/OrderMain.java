@@ -23,13 +23,11 @@ public class OrderMain implements Runnable {
 
 	private Logger logger = LoggerFactory.getLogger(OrderMain.class);
 
-	private static final int NUM = 100;
-
 //  private static Lock lock = new ReentrantLock();  // 加锁方式（单进程，多线程）
 	private Lock lock = new CuratorReentrantLock(ZK_STRING, ZK_LOCK_PATH); // 加锁方式2（多进程，多线程，分布式锁，使用Curator访问Zookeeper实现）
 
-	// 创建订单接口
-	public void createOrder() {
+	// 创建订单
+	private void createOrder() {
 		String orderCode = null;
 		lock.lock();
 		try {
@@ -55,8 +53,9 @@ public class OrderMain implements Runnable {
 	}
 
 	public static void main(String[] args) throws InterruptedException {
-		Thread[] ts = new Thread[NUM];
-		for(int i = 0; i < NUM; i++) {
+		int nThread = 100;
+		Thread[] ts = new Thread[nThread];
+		for(int i = 0; i < nThread; i++) {
 			ts[i] = new Thread(new OrderMain());
 		}
 
