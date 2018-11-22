@@ -15,7 +15,8 @@ import net.lht.common.zk.lock.CuratorReentrantLock;
  */
 public class ReentrantLockTester implements Runnable {
 
-	private static final String ZK_STRING = "10.1.1.132:2181,10.1.1.133:2181,10.1.1.136:2181";
+	//private static final String ZK_STRING = "10.1.1.132:2181,10.1.1.133:2181,10.1.1.136:2181";
+	private static final String ZK_STRING = "10.1.1.51:2181,10.1.1.52:2181,10.1.1.53:2181";
 	private static final String ZK_LOCK_PATH = "/LLOOCCKK";
 
 	private static OrderCodeGenerator ong = new OrderCodeGenerator(ZK_STRING);
