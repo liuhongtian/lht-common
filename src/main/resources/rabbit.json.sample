@@ -1,0 +1,21 @@
+{
+	"poolSize": 1,
+	"userName": "guest",
+	"password": "guest",
+	"virtualHost": "/",
+	"portNumber": 5672,
+	"hostName": "127.0.0.1",
+	"exchanges": [
+		"device-exchange"
+	],
+	"queues": [
+		"device-history-queue"
+	],
+	"binds": [
+		{
+			"queueName": "device-history-queue",
+			"exchangeName": "device-exchange",
+			"routingKey": "history"
+		}
+	]
+}
