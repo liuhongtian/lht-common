@@ -24,6 +24,12 @@ public class ReadWriteLockTester implements Runnable {
 
 //  private static Lock lock = new ReentrantLock();  // 加锁方式（单进程，多线程）
 	private ReadWriteLock lock = new CuratorReadWriteLock(ZK_STRING, ZK_LOCK_PATH); // 加锁方式2（多进程，多线程，分布式锁，使用Curator访问Zookeeper实现）
+	
+	private int tid;
+	
+	public ReadWriteLockTester(int tid) {
+		this.tid = tid;
+	}
 
 	@Override
 	public void run() {
@@ -32,7 +38,7 @@ public class ReadWriteLockTester implements Runnable {
 		try {
 			// ……业务代码：获取订单编号
 			orderCode = ong.getOrderCode();
-			logger.info(Thread.currentThread().getName() + " got lock: =======================>" + orderCode);
+			logger.info(tid + ": " + Thread.currentThread().getName() + " got lock: =======================>" + orderCode);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

@@ -26,6 +26,12 @@ public class ReentrantLockTester implements Runnable {
 //  private static Lock lock = new ReentrantLock();  // 加锁方式（单进程，多线程）
 	private Lock lock = new CuratorReentrantLock(ZK_STRING, ZK_LOCK_PATH); // 加锁方式2（多进程，多线程，分布式锁，使用Curator访问Zookeeper实现）
 
+	private int tid;
+	
+	public ReentrantLockTester(int tid) {
+		this.tid = tid;
+	}
+
 	@Override
 	public void run() {
 		String orderCode = null;
@@ -33,7 +39,7 @@ public class ReentrantLockTester implements Runnable {
 		try {
 			// ……业务代码：获取订单编号
 			orderCode = ong.getOrderCode();
-			logger.info(Thread.currentThread().getName() + " got lock: =======================>" + orderCode);
+			logger.info(tid + ": " + Thread.currentThread().getName() + " got lock: =======================>" + orderCode);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
