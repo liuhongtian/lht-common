@@ -20,9 +20,9 @@ public class CuratorReentrantLockTest {
 
 	@Test
 	public void test() {
-		int nThread = 100;
-		Thread[] ts = new Thread[nThread];
-		for(int i = 0; i < nThread; i++) {
+		int nThreads = 100;
+		Thread[] ts = new Thread[nThreads];
+		for(int i = 0; i < nThreads; i++) {
 			ts[i] = new Thread(new ReentrantLockTester());
 		}
 
