@@ -1,4 +1,4 @@
-package net.lht.common.misc;
+package net.lht.common.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;

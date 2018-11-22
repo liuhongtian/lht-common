@@ -1,4 +1,4 @@
-package net.lht.common.test.zk.lock;
+package net.lht.common.test.zookeeper.lock;
 
 import static org.junit.Assert.*;
 

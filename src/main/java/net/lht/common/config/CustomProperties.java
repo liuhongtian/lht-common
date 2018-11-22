@@ -1,4 +1,4 @@
-package net.lht.common.misc;
+package net.lht.common.config;
 
 import java.io.InputStream;
 import java.util.Properties;

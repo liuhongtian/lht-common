@@ -1,4 +1,4 @@
-package net.lht.common.misc;
+package net.lht.common.bytes;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
