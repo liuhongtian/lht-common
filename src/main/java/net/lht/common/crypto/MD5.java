@@ -1,4 +1,5 @@
-package net.lht.common.misc;
+package net.lht.common.crypto;
+
 
 import java.security.MessageDigest;
 
@@ -6,9 +7,9 @@ import java.security.MessageDigest;
  * @author liuhongtian
  * 
  */
-public class MD5Utils {
+public class MD5 {
 
-	public final static String MD5(byte[] btInput) {
+	public final static String encode(byte[] btInput) {
 		char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 		try {
@@ -34,8 +35,12 @@ public class MD5Utils {
 		}
 	}
 
-	public final static String MD5(String s) {
-		return MD5(s.getBytes());
+	public final static String encode(String s) {
+		return encode(s.getBytes());
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(encode("liuhongtian"));
 	}
 
 }

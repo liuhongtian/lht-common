@@ -13,7 +13,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
-import net.lht.common.misc.LocalFileUtils;
+import net.lht.common.file.LocalFileUtils;
 
 /**
  * 长连接消费者，用于即时接收消息

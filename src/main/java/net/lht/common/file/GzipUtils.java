@@ -1,4 +1,4 @@
-package net.lht.common.misc;
+package net.lht.common.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

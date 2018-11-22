@@ -1,4 +1,4 @@
-package net.lht.common.misc;
+package net.lht.common.redis;
 
 public class RedisConfig {
 

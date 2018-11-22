@@ -10,7 +10,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.GetResponse;
 
-import net.lht.common.misc.LocalFileUtils;
+import net.lht.common.file.LocalFileUtils;
 
 /**
  * 短连接消费者，用于定期接收消息<br>

@@ -1,4 +1,4 @@
-package net.lht.common.zk.lock;
+package net.lht.common.zookeeper.lock;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;

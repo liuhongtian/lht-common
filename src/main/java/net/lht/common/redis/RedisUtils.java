@@ -1,4 +1,4 @@
-package net.lht.common.misc;
+package net.lht.common.redis;
 
 //import java.time.LocalDateTime;
 //import java.time.format.DateTimeFormatter;
@@ -18,6 +18,8 @@ import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisFuture;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
+
+import net.lht.common.file.LocalFileUtils;
 
 /**
  * Redis工具

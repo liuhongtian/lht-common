@@ -9,10 +9,10 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import net.lht.common.misc.LocalFileUtils;
+import net.lht.common.file.LocalFileUtils;
 
 /**
- * RabbitMQ消息发送工具
+ * RabbitMQ队列、交换器、绑定初始化工具
  * 
  * @author liuhongtian
  *

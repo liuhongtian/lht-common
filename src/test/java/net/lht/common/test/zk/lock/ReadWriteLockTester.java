@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.lht.common.zk.lock.CuratorReadWriteLock;
+import net.lht.common.zookeeper.lock.CuratorReadWriteLock;
 
 /**
  * 读写锁测试（这里只用到了写锁）

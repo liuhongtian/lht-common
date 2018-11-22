@@ -1,4 +1,4 @@
-package net.lht.common.zk.lock;
+package net.lht.common.zookeeper.lock;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;

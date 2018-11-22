@@ -9,6 +9,8 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 
+import net.lht.common.file.LocalFileUtils;
+
 // Class --------------------------------------------------------------------------------------------------------
 public class MemcachedConfig {
 	// Constant(s)
