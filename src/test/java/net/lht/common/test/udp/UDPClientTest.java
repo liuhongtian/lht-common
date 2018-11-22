@@ -22,7 +22,7 @@ public class UDPClientTest {
 	public void tearDown() throws Exception {
 	}
 
-	@Test
+	//@Test
 	public void test() {
 		int poolSize = 100;
 		ExecutorService pool = Executors.newFixedThreadPool(poolSize);
