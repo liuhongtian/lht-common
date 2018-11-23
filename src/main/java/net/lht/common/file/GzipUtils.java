@@ -10,6 +10,9 @@ import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Java GZIP实现
  * 
@@ -17,6 +20,8 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 public class GzipUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(GzipUtils.class);
 
 	public static final int BUFFER = 1024;
 	public static final String EXT = ".gz";
@@ -59,8 +64,7 @@ public class GzipUtils {
 	 * 文件压缩
 	 * 
 	 * @param file
-	 * @param delete
-	 *            是否删除原始文件
+	 * @param delete 是否删除原始文件
 	 * @throws Exception
 	 */
 	public static void compress(File file, boolean delete) throws Exception {
@@ -115,8 +119,7 @@ public class GzipUtils {
 	 * 文件压缩
 	 * 
 	 * @param path
-	 * @param delete
-	 *            是否删除原始文件
+	 * @param delete 是否删除原始文件
 	 * @throws Exception
 	 */
 	public static void compress(String path, boolean delete) throws Exception {
@@ -163,8 +166,7 @@ public class GzipUtils {
 	 * 文件解压缩
 	 * 
 	 * @param file
-	 * @param delete
-	 *            是否删除原始文件
+	 * @param delete 是否删除原始文件
 	 * @throws Exception
 	 */
 	public static void decompress(File file, boolean delete) throws Exception {
@@ -214,13 +216,16 @@ public class GzipUtils {
 	 * 文件解压缩
 	 * 
 	 * @param path
-	 * @param delete
-	 *            是否删除原始文件
+	 * @param delete 是否删除原始文件
 	 * @throws Exception
 	 */
 	public static void decompress(String path, boolean delete) throws Exception {
 		File file = new File(path);
 		decompress(file, delete);
+	}
+
+	public static void main(String[] args) {
+		logger.debug("GzipUtils.main");
 	}
 
 }

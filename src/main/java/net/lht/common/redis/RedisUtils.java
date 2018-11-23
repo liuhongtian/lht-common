@@ -323,32 +323,7 @@ public class RedisUtils {
 	}
 
 	public static void main(String[] args) {
-
-		// ExecutorService tpool = Executors.newFixedThreadPool(1000);
-		// for (int i = 0; i < 1000; i++) {
-		// tpool.submit(new Runnable() {
-		// @Override
-		// public void run() {
-		// while (true) {
-		// String key = UUID.randomUUID().toString();
-		// LocalDateTime begin = LocalDateTime.now();
-		// System.out.println("begin:" +
-		// begin.format(DateTimeFormatter.ofPattern(DT_PATTERN)));
-		// set(key, key);
-		// String value = get(key);
-		// System.out.println(value);
-		// LocalDateTime end = LocalDateTime.now();
-		// System.out.println("end :" +
-		// end.format(DateTimeFormatter.ofPattern(DT_PATTERN)));
-		// System.out.println(end.getNano());
-		// }
-		//
-		// }
-		// });
-		// }
-
 		System.out.println(new RedisUtils("redis.json").hget("mymap", "myname"));
-
 	}
 
 }

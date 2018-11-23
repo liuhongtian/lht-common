@@ -17,6 +17,8 @@ import javax.xml.bind.util.ValidationEventCollector;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -33,7 +35,7 @@ import org.xml.sax.SAXException;
  */
 public class XmlUtil {
 
-	//private static final Logger log = Logger.getLogger(XmlUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlUtil.class);
 
 	private JAXBContext jaxbCtx;
 	private Marshaller marshaller;
@@ -43,10 +45,8 @@ public class XmlUtil {
 	 * 
 	 * object initer, used by constructor
 	 * 
-	 * @param ctxPath
-	 *            POJO package name
-	 * @param xsdName
-	 *            XML schema file (must in class path)
+	 * @param ctxPath POJO package name
+	 * @param xsdName XML schema file (must in class path)
 	 * @throws JAXBException
 	 * @throws SAXException
 	 */
@@ -71,10 +71,8 @@ public class XmlUtil {
 	 * 
 	 * custom constructor
 	 * 
-	 * @param ctxPath
-	 *            POJO package name
-	 * @param xsdName
-	 *            XML schema file (must in class path)
+	 * @param ctxPath POJO package name
+	 * @param xsdName XML schema file (must in class path)
 	 * @throws JAXBException
 	 * @throws SAXException
 	 */
@@ -95,25 +93,22 @@ public class XmlUtil {
 	/**
 	 * marshal POJO to stream
 	 * 
-	 * @param pojo
-	 *            POJO object
-	 * @param out
-	 *            stream to output
+	 * @param pojo POJO object
+	 * @param out  stream to output
 	 * @throws JAXBException
 	 */
 	private void marshal(Object pojo, OutputStream out) throws JAXBException {
 		if (marshaller != null) {
 			marshaller.marshal(pojo, out);
 		} else {
-			//log.fatal("Marshaller is null.");
+			logger.error("Marshaller is null.");
 		}
 	}
 
 	/**
 	 * unmarshal stream input to POJO
 	 * 
-	 * @param in
-	 *            stream to input
+	 * @param in stream to input
 	 * @return POJO
 	 * @throws JAXBException
 	 */
@@ -121,7 +116,7 @@ public class XmlUtil {
 		if (unmarshaller != null) {
 			return unmarshaller.unmarshal(in);
 		} else {
-			//log.fatal("Unmarshaller is null.");
+			logger.error("Unmarshaller is null.");
 			return null;
 		}
 	}
@@ -129,54 +124,41 @@ public class XmlUtil {
 	/**
 	 * parse POJO as defined type to XML string
 	 * 
-	 * @param pojo
-	 *            POJO to be parsed
-	 * @param clazz
-	 *            defined type
+	 * @param pojo  POJO to be parsed
+	 * @param clazz defined type
 	 * @return XML string, null if any exception
 	 */
 	public String parsePojo(Object pojo, Class<?> clazz) {
 
 		// return null if pojo is null.
 		if (pojo == null) {
-			//log.warn("pojo is null.");
+			logger.warn("pojo is null.");
 			return null;
 		}
 
 		// return null if clazz is null.
 		if (clazz == null) {
-			//log.fatal("defined type clazz is null.");
+			logger.error("defined type clazz is null.");
 			return null;
 		}
 
 		// test class cast, return null when false.
 		if (!clazz.isInstance(pojo)) {
-			//log.fatal("Can not parse POJO object as defined type: " + clazz.getName() + ".");
+			logger.warn("Can not parse POJO object as defined type: " + clazz.getName() + ".");
 			return null;
 		}
 
-		ByteArrayOutputStream stream = null;
 		String str = null;
-		try {
-			stream = new ByteArrayOutputStream();
+		try (ByteArrayOutputStream stream = new ByteArrayOutputStream();) {
 			marshal(pojo, stream);
 			byte[] buff = stream.toByteArray();
 			str = new String(buff, "UTF-8"); // 使用UTF-8编码
 		} catch (JAXBException e) {
-			//log.fatal("Can not parse POJO (" + pojo.getClass().getName() + ") to XML string.", e);
-			e.printStackTrace();
-			// System.out.println("============return=d");
-
+			logger.error("Can not parse POJO (" + pojo.getClass().getName() + ") to XML string.", e);
 		} catch (UnsupportedEncodingException e) {
-			//log.fatal("Can not parse POJO to XML string use UTF-8 encoding.", e);
-		} finally {
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					//log.warn(e.getMessage(), e);
-				}
-			}
+			logger.error("Can not parse POJO to XML string use UTF-8 encoding.", e);
+		} catch (IOException e) {
+			logger.error("meet some IOException.", e);
 		}
 
 		return str;
@@ -185,53 +167,44 @@ public class XmlUtil {
 	/**
 	 * parse XML string to POJO object as defined type
 	 * 
-	 * @param xmlStr
-	 *            XML string to be parsed
-	 * @param clazz
-	 *            defined type
+	 * @param xmlStr XML string to be parsed
+	 * @param clazz  defined type
 	 * @return POJO raw object, null if any exception
 	 */
 	public <T> T parseXmlStr(String xmlStr, Class<T> clazz) {
 
 		// return null if xmlStr is null.
 		if (xmlStr == null) {
-			//log.warn("xmlStr is null.");
+			logger.warn("xmlStr is null.");
 			return null;
 		}
 
 		// return null if clazz is null.
 		if (clazz == null) {
-			//log.fatal("defined type clazz is null.");
+			logger.error("defined type clazz is null.");
 			return null;
 		}
 
-		ByteArrayInputStream stream = null;
 		T obj = null;
-		try {
-			stream = new ByteArrayInputStream(xmlStr.trim().getBytes("UTF-8"));
+		try (ByteArrayInputStream stream = new ByteArrayInputStream(xmlStr.trim().getBytes("UTF-8"));) {
 			Object tmp = unmarshal(stream);
 
 			// test class cast, return null when false.
 			if (!clazz.isInstance(tmp)) {
-				//log.fatal("Can not parse XML string to POJO object as defined type: " + clazz.getName() + ".");
+				logger.error("Can not parse XML string to POJO object as defined type: " + clazz.getName() + ".");
 				return null;
 			}
 
 			obj = clazz.cast(tmp);
 
 		} catch (UnsupportedEncodingException e) {
-			//log.fatal("Can not parse XML string to POJO object as defined type use UTF-8 encoding.", e);
+			logger.error("Can not parse XML string to POJO object as defined type use UTF-8 encoding.", e);
 		} catch (JAXBException e) {
-			//log.fatal("Can not parse XML string to POJO object as defined type: " + clazz.getName() + ".", e);
-		} finally {
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					//log.warn(e.getMessage(), e);
-				}
-			}
+			logger.error("Can not parse XML string to POJO object as defined type: " + clazz.getName() + ".", e);
+		} catch (IOException e) {
+			logger.error("meet some IOException.", e);
 		}
+
 		return obj;
 	}
 

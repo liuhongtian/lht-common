@@ -1,10 +1,13 @@
 package net.lht.common.http;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLContext;
 
@@ -26,25 +29,29 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-//import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpsClient {
-	//private static Logger logger = Logger.getLogger(HttpsClient.class);
 
-	private static final String KEY_STORE_FILE = "www.bhz.com.jks";
-	private static final String KEY_STORE_PASSWORD = "bhz";
+	private Logger logger = LoggerFactory.getLogger(HttpsClient.class);
 
-	private static SSLConnectionSocketFactory scsf = null;
+	private SSLConnectionSocketFactory scsf;
 
-	static {
+	public HttpsClient(String keyStoreFile, String keyStorePassword) {
 		try {
-			scsf = initSSL(KEY_STORE_FILE, KEY_STORE_PASSWORD);
-		} catch (Exception e) {
-			//logger.fatal("SSLConnectionSocketFactory init faild!", e);
+			this.scsf = initSSL(keyStoreFile, keyStoreFile);
+		} catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
+				| CertificateException | IOException e) {
+			logger.error("SSLConnectionSocketFactory init faild, keyStoreFile=" + keyStoreFile + ", keyStorePassword="
+					+ keyStorePassword, e);
+			System.exit(1);
 		}
 	}
 
-	private static SSLConnectionSocketFactory initSSL(String keyStoreFile, String password) throws Exception {
+	private SSLConnectionSocketFactory initSSL(String keyStoreFile, String password)
+			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
+			KeyManagementException, UnrecoverableKeyException {
 		try (InputStream in = HttpsClient.class.getClassLoader().getResourceAsStream(keyStoreFile);) {
 			KeyStore keyStore = KeyStore.getInstance("jks");
 			keyStore.load(in, StringUtils.isEmpty(password) ? null : password.toCharArray());
@@ -53,9 +60,6 @@ public class HttpsClient {
 			// Allow TLSv1 protocol only
 			return new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" }, null,
 					SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
 		}
 	}
 
@@ -67,30 +71,24 @@ public class HttpsClient {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public static String[] get(String url) throws ClientProtocolException, IOException {
-		if (scsf == null) {
-			//logger.fatal("SSLConnectionSocketFactory not init.");
+	public String[] get(String url) throws ClientProtocolException, IOException {
+		if (this.scsf == null) {
+			logger.error("SSLConnectionSocketFactory not init.");
 			return null;
 		}
 
 		HttpGet httpget = new HttpGet(url);
-		//logger.debug("executing request: " + httpget.getRequestLine());
 
 		String rspStr = null;
 		StatusLine sl = null;
 		try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(scsf).build();
 				CloseableHttpResponse response = httpclient.execute(httpget);) {
 			HttpEntity entity = response.getEntity();
-			//logger.debug("----------------------------------------");
 			sl = response.getStatusLine();
-			//logger.debug(sl);
 			if (entity != null) {
-				//logger.debug("Response content length: " + entity.getContentLength());
 				rspStr = EntityUtils.toString(entity);
-				//logger.debug(rspStr);
 				EntityUtils.consume(entity);
 			}
-			//logger.debug("----------------------------------------");
 		}
 
 		String[] rsp = { sl == null ? null : new Integer(sl.getStatusCode()).toString(), rspStr };
@@ -107,10 +105,9 @@ public class HttpsClient {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public static String[] post(String url, String content, String contentType)
-			throws ClientProtocolException, IOException {
-		if (scsf == null) {
-			//logger.fatal("SSLConnectionSocketFactory not init.");
+	public String[] post(String url, String content, String contentType) throws ClientProtocolException, IOException {
+		if (this.scsf == null) {
+			logger.error("SSLConnectionSocketFactory not init.");
 			return null;
 		}
 
@@ -118,24 +115,16 @@ public class HttpsClient {
 		httppost.addHeader("Content-Type", contentType);
 		httppost.setEntity(new StringEntity(content));
 
-		//logger.debug("executing request: " + httppost.getRequestLine());
-		//logger.debug("with content: " + content);
-
 		String rspStr = null;
 		StatusLine sl = null;
 		try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(scsf).build();
 				CloseableHttpResponse response = httpclient.execute(httppost);) {
 			HttpEntity entity = response.getEntity();
-			//logger.debug("----------------------------------------");
 			sl = response.getStatusLine();
-			//logger.debug(sl);
 			if (entity != null) {
-				//logger.debug("Response content length: " + entity.getContentLength());
 				rspStr = EntityUtils.toString(entity);
-				//logger.debug(rspStr);
 				EntityUtils.consume(entity);
 			}
-			//logger.debug("----------------------------------------");
 		}
 
 		String[] rsp = { sl == null ? null : new Integer(sl.getStatusCode()).toString(), rspStr };
@@ -153,10 +142,9 @@ public class HttpsClient {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public static String[] postMultipart(String url, String[] names, String contents[], String[] contentTypes)
+	public String[] postMultipart(String url, String[] names, String contents[], String[] contentTypes)
 			throws ClientProtocolException, IOException {
-		if (scsf == null) {
-			//logger.fatal("SSLConnectionSocketFactory not init.");
+		if (this.scsf == null) {
 			return null;
 		}
 
@@ -171,31 +159,16 @@ public class HttpsClient {
 		HttpEntity reqEntity = mb.build();
 		httppost.setEntity(reqEntity);
 
-		//logger.debug("executing request: " + httppost.getRequestLine());
-		//logger.debug("with content: ");
-		try (InputStream content = reqEntity.getContent();) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(content));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				//logger.debug(line);
-			}
-		}
-
 		String rspStr = null;
 		StatusLine sl = null;
 		try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(scsf).build();
 				CloseableHttpResponse response = httpclient.execute(httppost);) {
 			HttpEntity entity = response.getEntity();
-			//logger.debug("----------------------------------------");
 			sl = response.getStatusLine();
-			//logger.debug(sl);
 			if (entity != null) {
-				//logger.debug("Response content length: " + entity.getContentLength());
 				rspStr = EntityUtils.toString(entity);
-				//logger.debug(rspStr);
 				EntityUtils.consume(entity);
 			}
-			//logger.debug("----------------------------------------");
 		}
 
 		String[] rsp = { sl == null ? null : new Integer(sl.getStatusCode()).toString(), rspStr };
@@ -203,7 +176,10 @@ public class HttpsClient {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String[] res = get("https://sandbox.scop.chinamobile.com:8102/api/v2/token?appKey=290KNRKKXQXPDJ95&secret=8ddca75947c10aa614396464c8a38f1b1e7bf29053e0ba559fa18662365976b7&timestamp=20160818133801008");
+		HttpsClient client = new HttpsClient("keystore.jks", "password");
+		client.logger.debug("HttpsClient.main");
+		String[] res = client.get(
+				"https://sandbox.scop.chinamobile.com:8102/api/v2/token?appKey=290KNRKKXQXPDJ95&secret=8ddca75947c10aa614396464c8a38f1b1e7bf29053e0ba559fa18662365976b7&timestamp=20160818133801008");
 		System.out.println("=============\n" + res[0] + "\n=============\n" + res[1]);
 	}
 

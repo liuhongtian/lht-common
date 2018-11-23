@@ -31,12 +31,12 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
-		<dependency>
+<!-- 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.25</version>
 		</dependency>
-
+ -->
 		<!-- https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>

@@ -17,68 +17,54 @@ import org.slf4j.LoggerFactory;
 
 public class LocalFileUtils {
 
-	private static Logger logger = LoggerFactory.getLogger(LocalFileUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(LocalFileUtils.class);
 
 	private static String FIX = File.separator;
 
 	/**
 	 * 删除指定文件
 	 * 
-	 * @param file
-	 *            待删除的文件
+	 * @param file 待删除的文件
 	 */
-	public static void deleteLocalFile(File file) {
-		logger.debug("Enter FileUtils.deleteLocalFile(), file=" + (file == null ? "" : file.getName()));
+	public static void deleteFile(File file) {
 		if (file != null) {
 			if (file.exists()) {
-				logger.info("delete local file: " + file.getName());
 				file.delete();
 			} else {
-				logger.debug("file: " + file.getName() + " not exists");
+				logger.warn("try to delete file: " + file.getName() + " not exists");
 			}
 		}
-		logger.debug("Exit FileUtils.deleteLocalFile(), file=" + (file == null ? "" : file.getName()));
 	}
 
 	/**
 	 * 将指定文件移动到指定位置
 	 * 
-	 * @param srcPath
-	 *            源路径
-	 * @param destPath
-	 *            目标路径
+	 * @param srcPath  源路径
+	 * @param destPath 目标路径
 	 */
-	public static void moveLocalFile(String srcPath, String destPath) {
-		logger.debug("Enter FileUtils.moveLocalFile(), srcPath=" + srcPath + ", destPath=" + destPath);
-
+	public static void moveFile(String srcPath, String destPath) {
 		File file = new File(srcPath);
 		File destDir = new File(destPath);
 		if (!destDir.exists()) {
 			destDir.mkdirs();
 		}
 		if (file.isDirectory()) {
-			logger.info(file.getName() + " is a directory, now move all sub files to " + destPath);
 			File[] files = file.listFiles();
 			for (int i = 0; i < files.length; i++) {
-				logger.info("move file:" + files[i].getName() + " to " + destPath);
-				files[i].renameTo(new File(destPath + files[i].getName()));
+				files[i].renameTo(new File(destPath + FIX + files[i].getName())); // TODO
 			}
 		} else {
-			logger.info("move file:" + file.getName() + " to " + destPath);
-			file.renameTo(new File(destPath + "/" + file.getName()));
+			file.renameTo(new File(destPath + FIX + file.getName()));
 		}
-		logger.debug("Exit FileUtils.moveLocalFile(), srcPath=" + srcPath + ", destPath=" + destPath);
 	}
 
 	/**
 	 * 获取指定目录下的文件名列表，只包含文件，不包括目录
 	 * 
-	 * @param localPath
-	 *            指定目录
+	 * @param localPath 指定目录
 	 * @return 文件列表
 	 */
-	public static List<String> getLocalFileNameList(String localPath) {
-		logger.debug("Enter FileUtils.getLocalFileNameList(), localPath=" + localPath);
+	public static List<String> getFileNameList(String localPath) {
 		List<String> fileNameList = new ArrayList<String>();
 		File file = new File(localPath);
 		File[] files = file.listFiles();
@@ -89,31 +75,19 @@ public class LocalFileUtils {
 				}
 			}
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("\tBEGIN LIST:");
-			for (String name : fileNameList) {
-				logger.debug("\t\t" + name);
-			}
-			logger.debug("\tEND LIST");
-		}
-		logger.debug("Exit FileUtils.getLocalFileNameList(), localPath=" + localPath);
 		return fileNameList;
 	}
 
 	/**
 	 * 根据文件名模式获取指定目录下的文件名列表，只包含文件，不包括目录
 	 * 
-	 * @param localPath
-	 *            指定目录
-	 * @param regex
-	 *            文件名模式
+	 * @param localPath 指定目录
+	 * @param regex     文件名模式
 	 * @return 文件列表
 	 */
-	public static List<String> getLocalFileNameList(String localPath, String regex) {
-		logger.debug("Enter FileUtils.getLocalFileNameList(), localPath=" + localPath + ", regex=" + regex);
-		List<String> fileNames = getLocalFileNameList(localPath);
+	public static List<String> getFileNameList(String localPath, String regex) {
+		List<String> fileNames = getFileNameList(localPath);
 		if (regex == null || regex.length() == 0) {
-			logger.debug("Exit FileUtils.getLocalFileNameList()");
 			return fileNames;
 		}
 		List<String> fileNameList = new ArrayList<String>();
@@ -124,22 +98,13 @@ public class LocalFileUtils {
 				fileNameList.add(fileName);
 			}
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("\tBEGIN LIST:");
-			for (String name : fileNameList) {
-				logger.debug("\t\t" + name);
-			}
-			logger.debug("\tEND LIST");
-		}
-		logger.debug("Exit FileUtils.getLocalFileNameList(), localPath=" + localPath + ", regex=" + regex);
 		return fileNameList;
 	}
 
 	/**
 	 * 将文件内容读入到字符串（主要用于读取配置文件，不适用于大文件）
 	 * 
-	 * @param fileName
-	 *            文件名
+	 * @param fileName 文件名
 	 * @return 文件内容
 	 */
 	public static String readToString(String fileName) {
@@ -160,8 +125,7 @@ public class LocalFileUtils {
 	/**
 	 * 将文件内容读入到字符串（主要用于读取配置文件，不适用于大文件），文件位于类路径中
 	 * 
-	 * @param fileName
-	 *            文件名
+	 * @param fileName 文件名
 	 * @return 文件内容
 	 */
 	public static String readToStringFromClasspath(String fileName) {
@@ -182,27 +146,23 @@ public class LocalFileUtils {
 	/**
 	 * 在指定路径创建文件并写入指定内容
 	 * 
-	 * @param path
-	 *            文件全路径
-	 * @param content
-	 *            文件内容
+	 * @param path    文件全路径
+	 * @param content 文件内容
 	 * @return
 	 */
-	public static boolean write(String path, String content) {
-		boolean result = true;
+	public static boolean writeFile(String path, String content) {
+		boolean result = false;
 
 		if (path.endsWith(FIX)) {
 			path = path.substring(0, path.lastIndexOf(FIX));
 		}
-
-		logger.debug("write: " + path);
 
 		File file = new File(path);
 
 		if (file.exists()) {
 			if (file.isDirectory()) {
 				logger.error("the path is directory: " + path);
-				return false;
+				return result;
 			} else {
 				file.delete();
 			}
@@ -210,15 +170,16 @@ public class LocalFileUtils {
 
 		try {
 			String dir = path.substring(0, path.lastIndexOf(FIX));
-			mkdirs(dir);
+			if (dir != null && dir.length() > 0) {
+				mkdirs(dir);
+			}
 			file.createNewFile();
 			PrintWriter pw = new PrintWriter(file, "UTF-8");
-			pw.println(content);
+			pw.print(content);
 			pw.close();
+			result = true;
 		} catch (IOException e) {
-			logger.error("create file failed: " + path);
-			logger.error(e.getMessage());
-			return false;
+			logger.error("create file failed: " + path, e);
 		}
 
 		return result;
@@ -238,7 +199,7 @@ public class LocalFileUtils {
 		File file = new File(path);
 
 		if (!file.exists()) {
-			logger.warn("file not found: " + path);
+			logger.warn("delete file / directory not found: " + path);
 			return result;
 		}
 
@@ -250,8 +211,7 @@ public class LocalFileUtils {
 	/**
 	 * 级联创建路径中的所有目录
 	 * 
-	 * @param path
-	 *            资源路径
+	 * @param path 资源路径
 	 */
 	private static void mkdirs(String path) {
 		File dir = new File(path);
@@ -284,13 +244,7 @@ public class LocalFileUtils {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(FIX);
-		logger.info(FIX);
-
-		// put("ok/liuhongtian.json", "{\"name\":\"刘洪天\"}");
-
-		// mkdirs("/zhangwan/liuhongtian/liuhongtian12.json");
-		// delete("/app/");
+		logger.debug(FIX);
 	}
 
 }

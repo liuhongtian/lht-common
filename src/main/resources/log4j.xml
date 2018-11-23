@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration
+	xmlns:log4j='http://jakarta.apache.org/log4j/'>
+	
+	<!-- 控制台输出全部级别的日志信息 -->
+	<appender name="CONSOLE"
+		class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%c %d{ISO8601}-- %p -- %m%n" />
+		</layout>
+		<!-- 过滤器设置输出的级别 -->
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="DEBUG" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+
+	<!-- 只输出debug级别的日志信息 -->
+	<appender name="DEBUG"
+		class="org.apache.log4j.DailyRollingFileAppender">
+		<!-- 日志文件存储的路径 -->
+		<param name="File" value="logs/lht-common_debug.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%c %d{ISO8601}-- %p -- %m%n" />
+		</layout>
+		<!-- 过滤器设置输出的级别 -->
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="DEBUG" />
+			<param name="LevelMax" value="DEBUG" />
+		</filter>
+	</appender>
+
+	<!-- 输出info、warn级别的日志信息 -->
+	<appender name="INFO"
+		class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/lht-common_info.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{ISO8601}-- %p -- %m%n" />
+		</layout>
+		<!-- 过滤器设置输出的级别 -->
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+			<param name="LevelMax" value="WARN" />
+		</filter>
+	</appender>
+	
+	<!-- 输出error和fatal级别的异常日志信息 -->
+	<appender name="ERROR"
+		class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File"
+			value="logs/lht-common_error.log" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{ISO8601}-- %p -- %l  -- %m%n" />
+		</layout>
+		<!-- 过滤器设置输出的级别 -->
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="ERROR" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+
+	<!-- 根logger的设置 -->
+	<root>
+		<priority value="CONSOLE" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="DEBUG" />
+		<appender-ref ref="INFO" />
+		<appender-ref ref="ERROR" />
+	</root>
+
+</log4j:configuration>

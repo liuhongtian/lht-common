@@ -1,8 +1,10 @@
 package net.lht.common.crypto;
 
-
 import javax.crypto.*;
 import javax.crypto.spec.DESKeySpec;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
@@ -16,6 +18,8 @@ import java.security.spec.InvalidKeySpecException;
  * 
  */
 public class DES {
+
+	private static final Logger logger = LoggerFactory.getLogger(DES.class);
 
 	/**
 	 * 自动生成一个密钥
@@ -70,8 +74,7 @@ public class DES {
 	 * 解密方法
 	 * 
 	 * @param keyHexString
-	 * @param encrypedHexString
-	 *            加密后的十六进制字符串，长度为32位
+	 * @param encrypedHexString 加密后的十六进制字符串，长度为32位
 	 * @return 解密后的字符串
 	 * @throws IllegalBlockSizeException
 	 * @throws BadPaddingException
@@ -151,7 +154,9 @@ public class DES {
 		return (byte) "0123456789ABCDEF".indexOf(c);
 	}
 
-	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeyException,
+			InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+		logger.debug("DES.main");
 		String key = genKeyHexString();
 		System.out.println("key=" + key);
 		String str = "liuhongtian";
