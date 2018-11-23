@@ -1,6 +1,7 @@
 package net.lht.common.time;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
@@ -48,8 +49,22 @@ public class TimeUtils {
 		return time;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getTimeString());
+	private static final DateTimeFormatter GMT_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
+	private static final String GMT = " GMT";
+
+	/**
+	 * 格式化当前时间到GMTString（格林威治标准时间），格式为：<br>
+	 * dd MMM yyyy HH:mm:ss GMT，例如：<br>
+	 * 19 Dec 2017 02:33:12 GMT
+	 * 
+	 * @return
+	 */
+	public static String nowToGMTString() {
+		return LocalDateTime.now(ZoneId.of("GMT")).format(GMT_FORMATTER) + GMT;
 	}
+	
+	public static void main(String[] args) {
+		System.out.println(nowToGMTString());
+	}	
 
 }
