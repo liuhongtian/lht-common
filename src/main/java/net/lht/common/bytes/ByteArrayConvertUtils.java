@@ -1,5 +1,8 @@
 package net.lht.common.bytes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //import org.apache.commons.lang3.ArrayUtils;
 
 import io.netty.buffer.ByteBufUtil;
@@ -14,6 +17,8 @@ import io.netty.buffer.ByteBufUtil;
  * @version $Id: ByteArrayConvertUtils.java,v 1.3 2017/08/25 02:42:22 baoxl Exp $
  */
 public class ByteArrayConvertUtils {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ByteArrayConvertUtils.class);
 
 	/**
 	 * 
@@ -226,9 +231,9 @@ public class ByteArrayConvertUtils {
 	
 	public static void main(String[] args) {
 		String b = "080c";
-		System.out.println(byte2ToShort(ByteBufUtil.decodeHexDump(b)));
+		logger.debug(Short.toString(byte2ToShort(ByteBufUtil.decodeHexDump(b))));
 		short s = 3661;
-		System.out.println(ByteBufUtil.hexDump(shortToByte2(s)));
+		logger.debug(ByteBufUtil.hexDump(shortToByte2(s)));
 	}
 
 }

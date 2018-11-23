@@ -3,6 +3,9 @@ package net.lht.common.bytes;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.buffer.ByteBufUtil;
 
 /**
@@ -12,6 +15,8 @@ import io.netty.buffer.ByteBufUtil;
  *
  */
 public class ByteArrayUtils {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ByteArrayUtils.class);
 
 	private static final String PREFIX = "00000000";
 	private static final String B0 = "0";
@@ -191,7 +196,7 @@ public class ByteArrayUtils {
 	public static void main(String[] args) throws UnsupportedEncodingException {
 		String str = "DB6789EEappid=xdfde_aaad4&tocken=a687333==xeee56739*$==";
 		String crc = ByteBufUtil.hexDump(getCRC16(str.getBytes("UTF-8")));
-		System.out.println(crc);
+		logger.debug(crc);
 	}
 
 }
