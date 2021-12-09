@@ -230,6 +230,20 @@ public class ByteArrayUtils {
 	}
 
 	/**
+	 * 网络传输的字节流（字节数组）型转换成long数据
+	 * 
+	 * @param bytes 长度为8的字节数组
+	 * @return 一个long数据
+	 */
+	public static long byteArray8OverNetworkToLong(byte[] bytes) {
+		byte[] arr = new byte[8];
+		for (int i = 0; i < 8; i++) {
+			arr[i] = bytes[7 - i];
+		}
+		return byteArray8ToLong(arr);
+	}
+
+	/**
 	 * 长整形转换成网络传输的字节流（字节数组）型数据
 	 * 
 	 * @param num 一个长整型数据
@@ -1160,11 +1174,14 @@ public class ByteArrayUtils {
 	 * @throws UnsupportedEncodingException
 	 */
 	public static void main(String... args) throws UnsupportedEncodingException {
-		String str = "刘洪天";
-		System.out.println(str);
-		String hex = stringToAsciiHex(str);
-		System.out.println(hex);
-		System.out.println(asciiHexToString(hex));
+		long l = Long.MAX_VALUE;
+		System.out.println("long: " + l);
+		System.out.println("hex: " + getHexString(longToByteArray8(l)));
+		byte[] b = longToByteArray8OverNetwork(l);
+		System.out.println("b: " + getHexString(b));
+
+		long n = byteArray8OverNetworkToLong(b);
+		System.out.println("n: " + n);
 	}
 
 }
