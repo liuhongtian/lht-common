@@ -1,5 +1,6 @@
 package net.lht.common.codec;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 /**
@@ -12,20 +13,6 @@ public class ByteArrayUtils {
 
 	private static final String B0 = "0";
 	private static final String B1 = "1";
-
-	public static void main(String... args) {
-		// System.out.println(binStringToByte("10000000.00000000-00000000_00000001|00000000|00000000_10000000
-		// 10011101"));
-		System.out.println(ByteArrayUtils.getHexString(ByteArrayUtils.intToByteArray4(12)));
-		System.out.println(ByteArrayUtils.getHexString(ByteArrayUtils.int2Byte(12)));
-		System.out.println(StringToAsciiString("aabvd"));
-		System.out.println(AsciiStringToString("6161627664"));
-		System.out.println(algorismToHexString(1125));
-		System.out.println(algorismToHexString(12, 8));
-
-		byte[] bytes = parseHexBinary("11000000");
-		System.out.println(byteArrayToString(bytes));
-	}
 
 	/**
 	 * 获取最短限定长度的BCD编码
@@ -524,6 +511,18 @@ public class ByteArrayUtils {
 	}
 
 	/**
+	 * 根据byte获取对应的二进制字符串
+	 * 
+	 * @param b
+	 * @return
+	 */
+	public static String getBinString(byte b) {
+		return "" + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1) + (byte) ((b >> 5) & 0x1)
+				+ (byte) ((b >> 4) & 0x1) + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1) + (byte) ((b >> 1) & 0x1)
+				+ (byte) ((b >> 0) & 0x1);
+	}
+
+	/**
 	 * 根据字节数组获得值(十六进制数字，字母大写)
 	 * 
 	 * @param bytes
@@ -531,6 +530,108 @@ public class ByteArrayUtils {
 	 */
 	public static String getHexString(byte[] bytes) {
 		return bytesToHexString(bytes, true);
+	}
+
+	/**
+	 * 根据字节获得值(十六进制数字)
+	 * 
+	 * @param b
+	 * @param upperCase
+	 * @return
+	 */
+	public static String getHexString(byte b, boolean upperCase) {
+		return byteToHexString(b, upperCase);
+	}
+
+	/**
+	 * 根据字节获得值(十六进制数字，字母大写)
+	 * 
+	 * @param b
+	 * @return
+	 */
+	public static String byteToHexString(byte b) {
+		return byteToHexString(b, true);
+	}
+
+	/**
+	 * 根据字节数组获得值(十六进制数字)
+	 * 
+	 * @param bytes
+	 * @param upperCase
+	 * @return
+	 */
+	public static String bytesToHexString(byte[] bytes, boolean upperCase) {
+		String ret = "";
+		for (int i = 0; i < bytes.length; i++) {
+			ret += Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1);
+		}
+		return upperCase ? ret.toUpperCase() : ret;
+	}
+
+	/**
+	 * 将十六进制的字符串转换为字节数组
+	 * 
+	 * @param s the hex string
+	 * @return byte[]
+	 */
+	public static byte[] hexStringToBytes(String s) {
+		final int len = s.length();
+
+		// "111" is not a valid hex encoding.
+		if (len % 2 != 0) {
+			throw new IllegalArgumentException("hexBinary needs to be even-length: " + s);
+		}
+
+		byte[] out = new byte[len / 2];
+
+		for (int i = 0; i < len; i += 2) {
+			int h = hexToBin(s.charAt(i));
+			int l = hexToBin(s.charAt(i + 1));
+			if (h == -1 || l == -1) {
+				throw new IllegalArgumentException("contains illegal character for hexBinary: " + s);
+			}
+
+			out[i / 2] = (byte) (h * 16 + l);
+		}
+
+		return out;
+	}
+
+	private static int hexToBin(char ch) {
+		if ('0' <= ch && ch <= '9') {
+			return ch - '0';
+		}
+		if ('A' <= ch && ch <= 'F') {
+			return ch - 'A' + 10;
+		}
+		if ('a' <= ch && ch <= 'f') {
+			return ch - 'a' + 10;
+		}
+		return -1;
+	}
+
+	/**
+	 * 将十六进制的字符串转换为字节数组（反序）
+	 * 
+	 * @param s the hex string
+	 * @return byte[]
+	 */
+	public static byte[] revertHexStringToBytes(String s) {
+		if (s.length() % 2 != 0) {
+			s = "0" + s;
+		}
+		byte[] tem = s.getBytes();
+		byte[] ret = new byte[tem.length];
+		for (int i = 0; i < tem.length; i++) {
+			if (i % 2 == 0 && i < tem.length - 1) {
+				ret[i] = tem[tem.length - i - 2];
+				ret[i + 1] = tem[tem.length - i - 1];
+			}
+		}
+		String t = new String(ret);
+		byte[] m = hexStringToBytes(t);
+
+		return m;
 	}
 
 	/**
@@ -555,50 +656,34 @@ public class ByteArrayUtils {
 	}
 
 	/**
-	 * 根据字节数组获得值(十六进制数字)
+	 * 根据字节获得值(十六进制数字)
 	 * 
 	 * @param bytes
 	 * @param upperCase
 	 * @return
 	 */
-	public static String bytesToHexString(byte[] bytes, boolean upperCase) {
-		String ret = "";
-		for (int i = 0; i < bytes.length; i++) {
-			ret += Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1);
-		}
+	public static String byteToHexString(byte b, boolean upperCase) {
+		String ret = Integer.toString((b & 0xff) + 0x100, 16).substring(1);
 		return upperCase ? ret.toUpperCase() : ret;
 	}
 
 	/**
-	 * 将十六进制的字符串转换为字节数组
+	 * 将十六进制的字符串转换为字节
 	 * 
 	 * @param hexString the hex string
-	 * @return byte[]
-	 */
-	public static byte[] hexStringToBytes(String hexString) {
-		if (hexString == null || hexString.equals("")) {
-			return null;
-		}
-
-		hexString = hexString.toUpperCase();
-		int length = hexString.length() / 2;
-		char[] hexChars = hexString.toCharArray();
-		byte[] d = new byte[length];
-		for (int i = 0; i < length; i++) {
-			int pos = i * 2;
-			d[i] = (byte) (hexCharToByte(hexChars[pos]) << 4 | hexCharToByte(hexChars[pos + 1]));
-		}
-		return d;
-	}
-
-	/**
-	 * 将十六进制数字涉及的字符转换为byte
-	 * 
-	 * @param c char
 	 * @return byte
 	 */
-	private static byte hexCharToByte(char c) {
-		return (byte) "0123456789ABCDEF".indexOf(c);
+	public static byte hexStringToByte(String hexString) {
+		if (hexString == null || hexString.equals("")) {
+			return 0x00;
+		}
+		if (hexString.length() == 1) {
+			hexString = "0" + hexString;
+		} else if (hexString.length() > 2) {
+			hexString = hexString.substring(0, 2);
+		}
+		hexString = hexString.toUpperCase();
+		return Integer.decode("0x" + hexString).byteValue();
 	}
 
 	/**
@@ -697,39 +782,36 @@ public class ByteArrayUtils {
 	}
 
 	/**
-	 * 字符串转ASCII码字符串
+	 * 【不支持中文！】String明文转ASCII码hex字符串 一个明文字符生成两个字符表示的16进制ASCII码
 	 * 
-	 * @param String 字符串
-	 * @return ASCII字符串
+	 * @param str
+	 * @return
 	 */
-	public static String StringToAsciiString(String content) {
-		String result = "";
-		int max = content.length();
-		for (int i = 0; i < max; i++) {
-			char c = content.charAt(i);
-			String b = Integer.toHexString(c);
-			result = result + b;
+	public static String stringToAsciiHex(String str) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			// 这里的第二个参数16表示十六进制
+			sb.append(Integer.toString(c, 16));
 		}
-		return result;
+		return sb.toString();
+
 	}
 
 	/**
-	 * ASCII码字符串转字符串
+	 * 【不支持中文！】ASCII码hex字符串转String明文 每两个字符表示的16进制ASCII码解析成一个明文字符
 	 * 
-	 * @param String ASCII字符串
-	 * @return 字符串
+	 * @param hex
+	 * @return
 	 */
-	public static String AsciiStringToString(String content) {
-		String result = "";
-		int length = content.length() / 2;
-		for (int i = 0; i < length; i++) {
-			String c = content.substring(i * 2, i * 2 + 2);
-			int a = hexStringToAlgorism(c);
-			char b = (char) a;
-			String d = String.valueOf(b);
-			result += d;
+	public static String asciiHexToString(String hex) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < hex.length() - 1; i += 2) {
+			String h = hex.substring(i, (i + 2));
+			int decimal = Integer.parseInt(h, 16);
+			sb.append((char) decimal);
 		}
-		return result;
+		return sb.toString();
 	}
 
 	/**
@@ -975,39 +1057,6 @@ public class ByteArrayUtils {
 		return collection;
 	}
 
-	/**
-	 * ASCII码hex字符串转String明文 每两个字符表示的16进制ASCII码解析成一个明文字符
-	 * 
-	 * @param hex
-	 * @return
-	 */
-	public static String asciiHex2Str(String hex) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < hex.length() - 1; i += 2) {
-			String h = hex.substring(i, (i + 2));
-			int decimal = Integer.parseInt(h, 16);
-			sb.append((char) decimal);
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * String明文转ASCII码hex字符串 一个明文字符生成两个字符表示的16进制ASCII码
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static String str2AsciiHex(String str) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < str.length(); i++) {
-			char c = str.charAt(i);
-			// 这里的第二个参数16表示十六进制
-			sb.append(Integer.toString(c, 16));
-		}
-		return sb.toString();
-
-	}
-
 	public static int getUINT8(byte data) { // 将data字节型数据转换为0~255 (0xFF 即BYTE)
 		return data & 0x0FF;
 	}
@@ -1050,77 +1099,13 @@ public class ByteArrayUtils {
 		return result;
 	}
 
-	// TODO 下面需要确认！！！
-
-	// TODO what?
-	public static byte[] parseHexBinary(String s) {
-		final int len = s.length();
-
-		// "111" is not a valid hex encoding.
-		if (len % 2 != 0) {
-			throw new IllegalArgumentException("hexBinary needs to be even-length: " + s);
-		}
-
-		byte[] out = new byte[len / 2];
-
-		for (int i = 0; i < len; i += 2) {
-			int h = hexToBin(s.charAt(i));
-			int l = hexToBin(s.charAt(i + 1));
-			if (h == -1 || l == -1) {
-				throw new IllegalArgumentException("contains illegal character for hexBinary: " + s);
-			}
-
-			out[i / 2] = (byte) (h * 16 + l);
-		}
-
-		return out;
-	}
-
-	// TODO only used by parseHexBinary
-	private static int hexToBin(char ch) {
-		if ('0' <= ch && ch <= '9') {
-			return ch - '0';
-		}
-		if ('A' <= ch && ch <= 'F') {
-			return ch - 'A' + 10;
-		}
-		if ('a' <= ch && ch <= 'f') {
-			return ch - 'a' + 10;
-		}
-		return -1;
-	}
-
 	/**
-	 * TODO ?
+	 * 不定长的字节数组转int
 	 * 
-	 * @param hexString
-	 * @return byte[]
-	 */
-	public byte[] hexStringHigh2Low(String hexString) {
-		if (hexString.length() % 2 != 0) {
-			hexString = "0" + hexString;
-		}
-		byte[] tem = hexString.getBytes();
-		// byte[] tem = TypeConver.hexStringToBytes(hexString);
-		byte[] ret = new byte[tem.length];
-		for (int i = 0; i < tem.length; i++) {
-			if (i % 2 == 0 && i < tem.length - 1) {
-				ret[i] = tem[tem.length - i - 2];
-				ret[i + 1] = tem[tem.length - i - 1];
-			}
-		}
-		String t = new String(ret);
-		byte[] m = hexStringToBytes(t);
-
-		return m;
-	}
-
-	/**
-	 * 
-	 * @param b
+	 * @param bytes
 	 * @return
 	 */
-	public static int byte2Int(byte[] bytes) {
+	public static int bytesToInt(byte[] bytes) {
 		int value = 0;
 		for (int i = 0; i < bytes.length; i++) {
 			int shift = (bytes.length - 1 - i) * 8;
@@ -1130,109 +1115,56 @@ public class ByteArrayUtils {
 	}
 
 	/**
+	 * int转不定长的字节数组（去掉前导的0x00）
 	 * 
-	 * @param intValue
+	 * @param num
 	 * @return
 	 */
-	public static byte[] int2Byte(int intValue) {
-		byte[] b = new byte[2];
-		for (int i = 0; i < 2; i++) {
-			b[i] = (byte) (intValue >> 8 * (1 - i) & 0xFF);
+	public static byte[] intToBytes(int num) {
+		// 0
+		if (num == 0) {
+			byte[] b = new byte[1];
+			b[0] = 0x00;
+			return b;
 		}
+
+		byte[] tmp = intToByteArray4(num);
+		int purge = 0;
+		for (int i = 0; i < 4; i++) {
+			if (tmp[i] == 0x00) {
+				purge++;
+			} else {
+				break;
+			}
+		}
+
+		byte[] b = new byte[4 - purge];
+		copy(tmp, b, purge, 0, 4 - purge);
 		return b;
 	}
 
 	/**
+	 * short转网络传输格式的字节数组
 	 * 
-	 * @param intValue
+	 * @param s
 	 * @return
 	 */
-	public static String int2HexHigh2Low(int intValue) {
-		String intStr = Integer.toHexString(intValue);
-		int len = intStr.length();
-		while (len < 4) {
-			intStr = "0" + intStr;
-			len++;
-		}
-		String strHigh2Low = intStr.substring(2, 4) + intStr.substring(0, 2);
-		return strHigh2Low;
+	public static String shortToHexStringOverNetwork(short s) {
+		return getHexString(shortToByteArray2(Short.reverseBytes(s)));
 	}
 
 	/**
-	 * ByteתBit
-	 */
-	public static String byteToBit(byte b) {
-		return "" + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1) + (byte) ((b >> 5) & 0x1)
-				+ (byte) ((b >> 4) & 0x1) + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1) + (byte) ((b >> 1) & 0x1)
-				+ (byte) ((b >> 0) & 0x1);
-	}
-
-	public String bytesToBit(byte[] b) {
-		String bitStr = "";
-		for (int i = 0; i < b.length; i++) {
-			bitStr = bitStr + (byte) ((b[i] >> 7) & 0x1) + (byte) ((b[i] >> 6) & 0x1) + (byte) ((b[i] >> 5) & 0x1)
-					+ (byte) ((b[i] >> 4) & 0x1) + (byte) ((b[i] >> 3) & 0x1) + (byte) ((b[i] >> 2) & 0x1)
-					+ (byte) ((b[i] >> 1) & 0x1) + (byte) ((b[i] >> 0) & 0x1);
-		}
-		return bitStr;
-	}
-
-	/**
-	 * Bit to Byte
-	 */
-	public byte BitToByte(String byteStr) {
-		int re, len;
-		if (null == byteStr) {
-			return 0;
-		}
-		len = byteStr.length();
-		if (len != 4 && len != 8) {
-			return 0;
-		}
-		if (len == 8) {
-			if (byteStr.charAt(0) == '0') {
-				re = Integer.parseInt(byteStr, 2);
-			} else {
-				re = Integer.parseInt(byteStr, 2) - 256;
-			}
-		} else {
-			re = Integer.parseInt(byteStr, 2);
-		}
-		return (byte) re;
-	}
-
-	/**
-	 * int转化为4字节即8字符的hexstring，且低字节在前，高字节在后 其中int范围为：0-65535
+	 * 调试代码
 	 * 
-	 * @param intValue
-	 * @return
+	 * @param args
+	 * @throws UnsupportedEncodingException
 	 */
-	public static String int4HexHigh2Low(long intValue) {
-		String intStr = Long.toHexString(intValue);
-		int len = intStr.length();
-		while (len < 8) {
-			intStr = "0" + intStr;
-			len++;
-		}
-		String strHigh2Low = intStr.substring(6, 8) + intStr.substring(4, 6) + intStr.substring(2, 4)
-				+ intStr.substring(0, 2);
-		return strHigh2Low;
-	}
-
-	public static String convertStringToHex(String str) {
-
-		char[] chars = str.toCharArray();
-
-		StringBuffer hex = new StringBuffer();
-		for (int i = 0; i < chars.length; i++) {
-			String myhex = Integer.toHexString((int) chars[i]);
-			if (myhex.length() == 1) {
-				myhex = "0" + myhex;
-			}
-			hex.append(myhex);
-		}
-
-		return hex.toString();
+	public static void main(String... args) throws UnsupportedEncodingException {
+		String str = "刘洪天";
+		System.out.println(str);
+		String hex = stringToAsciiHex(str);
+		System.out.println(hex);
+		System.out.println(asciiHexToString(hex));
 	}
 
 }
